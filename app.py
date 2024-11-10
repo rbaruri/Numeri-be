@@ -1,23 +1,32 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 import google.generativeai as genai
 import os
 import io
 from PIL import Image
 import tempfile
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Enable CORS for all routes
+# Enable CORS for all routes (you can restrict this to specific origins in production)
 CORS(app)
 
 # Set your Gemini API key as an environment variable
-os.environ["GEMINI_API_KEY"]
+if "GEMINI_API_KEY" not in os.environ:
+    raise KeyError("GEMINI_API_KEY environment variable not set")
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 def upload_to_gemini(image_bytes, mime_type=None):
     """Uploads the given image bytes to Gemini."""
     print(f"Preparing to upload image with MIME type: {mime_type}")
+
+    # Check if the MIME type is an image type
+    if mime_type not in ['image/jpeg', 'image/png']:
+        raise ValueError(f"Unsupported image type: {mime_type}")
 
     # Use tempfile to create a temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp_file:
@@ -33,7 +42,6 @@ def upload_to_gemini(image_bytes, mime_type=None):
         # Clean up: remove the temporary file after upload
         os.remove(temp_file_path)
 
-# Define the image processing route
 @app.route('/process-image', methods=['POST'])
 def process_image():
     try:
@@ -85,6 +93,9 @@ def process_image():
         # Return the generated answer
         return jsonify({'answer': response.text})
 
+    except ValueError as ve:
+        print(f"Value error: {str(ve)}")
+        return jsonify({'error': str(ve)}), 400
     except Exception as e:
         print(f"Error processing image: {str(e)}")
         return jsonify({'error': f'Error processing image: {str(e)}'}), 500

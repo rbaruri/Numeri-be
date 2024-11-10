@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Set your Gemini API key as an environment variable
-os.environ["GEMINI_API_KEY"] = "AIzaSyDrT6Xm79KWXa_x2NxYSA5c7h-8kB59ppE"
+os.environ["GEMINI_API_KEY"]
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 def upload_to_gemini(image_bytes, mime_type=None):

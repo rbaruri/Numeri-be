@@ -15,6 +15,12 @@ app = Flask(__name__)
 # Enable CORS for all routes (you can restrict this to specific origins in production)
 CORS(app)
 
+#create a health endpoint
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'ok'})
+
+
 # Set your Gemini API key as an environment variable
 if "GEMINI_API_KEY" not in os.environ:
     raise KeyError("GEMINI_API_KEY environment variable not set")

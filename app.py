@@ -107,4 +107,4 @@ def process_image():
         return jsonify({'error': f'Error processing image: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
